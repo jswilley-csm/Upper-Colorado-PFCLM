@@ -5,20 +5,32 @@ Upper Colorado River Basin
 
 Note to modelers:
 This is a python-wrapped version of the PF-CLM run script for the Upper Colorado River
-Basin Model. It is being transcribed from a TCL version of the model script by Jackson
-Swilley on January 30th 2022. An important note is that other iterations of this model 
-have been run, and the script being transcribed is not necessarily the 'official' script,
-as there isn't really any one 'official' version of the model to transcribe.
+Basin Model. This model represents a subdomain of the CONUS 2.0 PF-CLM model. The default
+inputs are clipped from CONUS 2.0 inputs – see CONUS 2.0 documentation for the methods
+used in their development. An aside, you will an initial condition file and meteorological
+forcing data; neither has a default. To access the original set of input parameters, login 
+to Verde and navigate to: /hydrodata/PFCLM/UCRB_Baseline. If you are not a group member, 
+reach out and have one of us share the files with you – we'd be happy to. On Verde, make 
+sure you have the original files by confirming they are dated as follows:
+
+	 4.2M Feb  4 00:54 UCRB.final.mannings.pfb
+	  42M Feb  4 00:54 UCRB.final.subsurface.pfb
+	  42M Feb  4 00:54 UCRB.final.flow_barrier.pfb
+	 4.2M Feb  4 00:54 UCRB.final.slope_y.pfb
+	 4.2M Feb  4 00:55 UCRB.final.slope_x.pfb
+	 4.2M Feb  4 00:55 UCRB.final.landcover_IGBP.pfb
+	 4.3K Feb 12 07:22 UCRB.final.drv_vegp.dat
+	 1.1M Feb 12 07:51 UCRB.final.domain.pfsol
+	 9.4K Feb 12 08:00 UCRB.final.drv_clmin.dat
+	  41M Feb 12 08:14 UCRB.final.drv_vegm.dat
 
 Version History:
 Jackson Swilley | Jan 30, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.com 
 	Comment: original transcription
+	
+Jackson Swilley | Feb 12, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.com 
+	Comment: adding clipped CONUS 2.0 inputs
 
-Peyman Abbaszadeh  | Feb 01, 2022 | pabbaszadeh@princeton.edu
-	Comment: getting original transcription to run
-
-Jackson Swilley | Feb 01, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.com
-	Comment: writing restart algorithm
 '''
 
 
@@ -40,32 +52,32 @@ import shutil
 # User-defined local variables
 #-----------------------------------------------------------------------------------------
 
-runname                = 'UCRB-run-001'
+run_name               = 'UCRB-run-001'
 
-current_path           = get_absolute_path('.')
+script_path            = get_absolute_path('.')
 input_path             = '../inputs/'
 forcing_path           = '../forcing/'
 clm_output_path        = '../clm_output/'
 pf_output_path         = '../pf_output/'
 restart_output_path    = '../restart_files/'
 
-solid_file             = 'UCRB.Final1km.domain.pfsol'
-subsurface_file        = 'CONUS2.0.Final1km.Subsurface.pfb'
-slope_x_file           = 'CONUS2.0.Final1km.slopex.pfb'
-slope_y_file           = 'CONUS2.0.Final1km.slopey.pfb'
-flow_barrier_file      = 'CONUS2.0.Final1km.Flow_Barrier.pfb'
 pf_run_file            = 'UCRB-PFCLM-Run-Script.py'
+domain_file            = 'UCRB.final.domain.pfsol'
+subsurface_file        = 'UCRB.final.subsurface.pfb'
+slope_x_file           = 'UCRB.final.slopex.pfb'
+slope_y_file           = 'UCRB.final.slopey.pfb'
+flow_barrier_file      = 'UCRB.final.flow_barrier.pfb'
 
-# Timing variables
+start_time             = 0
+stop_time              = 8760
 
-# Initial condition
 
 
 #-----------------------------------------------------------------------------------------
 # Create ParFlow run object 'model'
 #-----------------------------------------------------------------------------------------
 
-model = Run(runname, __file__)
+model = Run(run_name, __file__)
 model.FileVersion = 4
 
 
@@ -75,26 +87,26 @@ model.FileVersion = 4
 
 set_working_directory( pf_output_path )
 
-cp( input_path + solid_file )
+cp( input_path + domain_file )
 cp( input_path + subsurface_file )
 cp( input_path + flow_barrier_file )
 cp( input_path + slope_x_file )
 cp( input_path + slope_x_file )
-cp( current_path + pf_run_file )
+cp( script_path + pf_run_file )
 
 
 #-----------------------------------------------------------------------------------------
 # Setup timing info
 #-----------------------------------------------------------------------------------------
 
-istep = 0
-clmstep = istep+1
+istep =      start_time
+clmstep =    start_time + 1
 
 model.TimingInfo.BaseUnit        = 1.0
 model.TimingInfo.DumpInterval    = 1.0
-model.TimingInfo.StartCount      = istep
-model.TimingInfo.StartTime       = istep
-model.TimingInfo.StopTime        = 96.0
+model.TimingInfo.StartCount      = start_time
+model.TimingInfo.StartTime       = start_time
+model.TimingInfo.StopTime        = stop_time
 
 model.TimeStep.Type              = 'Constant'
 model.TimeStep.Value             =  1.0
@@ -107,8 +119,6 @@ model.TimeStep.Value             =  1.0
 model.Process.Topology.P = 16
 model.Process.Topology.Q = 16
 model.Process.Topology.R = 1
-
-nproc = model.Process.Topology.P * model.Process.Topology.Q * model.Process.Topology.R
 
 
 #-----------------------------------------------------------------------------------------
@@ -136,7 +146,7 @@ model.GeomInput.Names                    = 'domaininput indi_input'
 model.GeomInput.domaininput.GeomName     = 'domain'
 model.GeomInput.domaininput.InputType    = 'SolidFile'
 model.GeomInput.domaininput.GeomNames    = 'domain'
-model.GeomInput.domaininput.FileName     = solid_file
+model.GeomInput.domaininput.FileName     = domain_file
 model.Geom.domain.Patches                = 'land top bottom'
 
 
@@ -784,5 +794,4 @@ model.Solver.WriteSiloCLM                          = False
 #-----------------------------------------------------------------------------------------
 
 model.run()
-
 
