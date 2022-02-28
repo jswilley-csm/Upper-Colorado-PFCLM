@@ -36,6 +36,20 @@ Recommended Directory Structure:
             YYYY
             ...
 
+Things You Should Change:
+    1.) the start and stop times - you won't finish in 8760 timesteps 12 hours; try 2000
+    2.) the initial pressure file - use the last pressure file from your spinup
+    3.) the clm driver file's start time based on the forcing you give it
+    4.) probably the run name, your call though
+    5.) which parameters you want printed - check the solvers settings at the bottom
+    
+Differences from CONUS 2.0:
+    1.) the extent
+    2.) boundary conditions - CONUS has several, UCRB only has no-flow and overland-flow
+            patches: top, bottom, land
+    3.) initialization - unless you clip the CONUS 2.0 initial pressure and use that
+    4.) the number of processors required
+
 Version History:
 Jackson Swilley | Jan 30, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.com 
     Comment: original transcription
@@ -48,6 +62,9 @@ Jackson Swilley | Feb 21, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.
     
 Jackson Swilley | Feb 28, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.com 
     Comment: updating documentation
+    
+Jackson Swilley | Feb 28, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.com 
+    Comment: same day - new update, adding the G.D. flow barrier (should have earlier)
 '''
 
 
@@ -351,6 +368,16 @@ model.Geom.g7.Perm.TensorValZ         = 0.1
 
 
 #-----------------------------------------------------------------------------------------
+# Vertical flow Barrier
+#-----------------------------------------------------------------------------------------
+
+model.Solver.Nonlinear.FlowBarrierZ    = True
+model.FBz.Type                         = 'PFBFile'
+model.Geom.domain.FBz.FileName         = flow_barrier_file
+model.dist(flow_barrier_file)
+
+
+#-----------------------------------------------------------------------------------------
 # Porosity
 #-----------------------------------------------------------------------------------------
 
@@ -424,7 +451,7 @@ model.Geom.g8.Porosity.Value        = 0.33
 
 
 #-----------------------------------------------------------------------------------------
-# Relative Permeability
+# Relative permeability
 #-----------------------------------------------------------------------------------------
 
 model.Phase.RelPerm.Type         = 'VanGenuchten'
