@@ -13,16 +13,28 @@ to Verde and navigate to: /hydrodata/PFCLM/UCRB_Baseline. If you are not a group
 reach out and have one of us share the files with you – we'd be happy to. On Verde, make 
 sure you have the original files by confirming they are dated as follows:
 
-	 4.2M Feb  4 00:54 UCRB.final.mannings.pfb
-	  42M Feb  4 00:54 UCRB.final.subsurface.pfb
-	  42M Feb  4 00:54 UCRB.final.flow_barrier.pfb
-	 4.2M Feb  4 00:54 UCRB.final.slope_y.pfb
-	 4.2M Feb  4 00:55 UCRB.final.slope_x.pfb
-	 4.2M Feb  4 00:55 UCRB.final.landcover_IGBP.pfb
-	 4.3K Feb 12 07:22 UCRB.final.drv_vegp.dat
-	 1.1M Feb 12 07:51 UCRB.final.domain.pfsol
-	 9.4K Feb 12 08:00 UCRB.final.drv_clmin.dat
-	  41M Feb 12 08:14 UCRB.final.drv_vegm.dat
+		 hydrodata  41M Feb 28 09:57 UCRB.final.drv_vegm.dat
+		 hydrodata 4.2M Feb 28 09:57 UCRB.final.mannings.pfb
+		 hydrodata  42M Feb 28 09:57 UCRB.final.subsurface.pfb
+		 hydrodata  42M Feb 28 09:57 UCRB.final.flow_barrier.pfb
+		 hydrodata 4.2M Feb 28 09:57 UCRB.final.slope_y.pfb
+		 hydrodata 4.2M Feb 28 09:57 UCRB.final.slope_x.pfb
+		 hydrodata 4.2M Feb 28 09:57 UCRB.final.landcover_IGBP.pfb
+		 hydrodata 4.3K Feb 28 09:57 UCRB.final.drv_vegp.dat
+		 hydrodata 9.4K Feb 28 09:57 UCRB.final.drv_clmin.dat
+		 hydrodata 876K Feb 28 09:57 UCRB.final.domain.pfsol
+		 
+Recommended Directory Structure:
+	UCRB-run-001         <- parent directory to hold all files for documentation
+		scripts          <- holds this script and others i.e. your job script
+		inputs           <- to hold your official UCRB run inputs
+		pf-output        <- to hold pressure files and other values you choose to print
+		clm-output       <- to hold CLM output files
+		restart-files    <- to contain copies of CLM restart files and last pressure files
+		forcing          <- forcing parent directory to hold meteorological inputs
+			YYYY         <- if running multiple years, add subfolders with years as names
+			YYYY
+			...
 
 Version History:
 Jackson Swilley | Jan 30, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.com 
@@ -31,6 +43,11 @@ Jackson Swilley | Jan 30, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.
 Jackson Swilley | Feb 12, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.com 
 	Comment: adding clipped CONUS 2.0 inputs
 
+Jackson Swilley | Feb 21, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.com 
+	Comment: final inputs - now runs
+	
+Jackson Swilley | Feb 28, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.com 
+	Comment: updating documentation
 '''
 
 
@@ -54,23 +71,24 @@ import shutil
 
 run_name               = 'UCRB-run-001'
 
-script_path            = get_absolute_path('.')
+script_path            = get_absolute_path('.') + '/'
 input_path             = '../inputs/'
-forcing_path           = '../forcing/'
-clm_output_path        = '../clm_output/'
-pf_output_path         = '../pf_output/'
-restart_output_path    = '../restart_files/'
+forcing_path           = '../forcing'
+clm_output_path        = '../clm-output/'
+pf_output_path         = '../pf-output/'
+restart_output_path    = '../restart-files/'
 
 pf_run_file            = 'UCRB-PFCLM-Run-Script.py'
-domain_file            = 'UCRB.final.domain.pfsol'
+domain_file            = 'UCRB.final.domain.pfsol'  
+mannings_file          = 'UCRB.final.mannings.pfb'
 subsurface_file        = 'UCRB.final.subsurface.pfb'
-slope_x_file           = 'UCRB.final.slopex.pfb'
-slope_y_file           = 'UCRB.final.slopey.pfb'
+slope_x_file           = 'UCRB.final.slope_x.pfb'
+slope_y_file           = 'UCRB.final.slope_y.pfb'
 flow_barrier_file      = 'UCRB.final.flow_barrier.pfb'
+initial_file           = 'UCRB-run-001.initial_press.pfb'
 
 start_time             = 0
 stop_time              = 8760
-
 
 
 #-----------------------------------------------------------------------------------------
@@ -91,7 +109,9 @@ cp( input_path + domain_file )
 cp( input_path + subsurface_file )
 cp( input_path + flow_barrier_file )
 cp( input_path + slope_x_file )
-cp( input_path + slope_x_file )
+cp( input_path + slope_y_file )
+cp( input_path + initial_file )
+cp( input_path + mannings_file )
 cp( script_path + pf_run_file )
 
 
@@ -99,8 +119,8 @@ cp( script_path + pf_run_file )
 # Setup timing info
 #-----------------------------------------------------------------------------------------
 
-istep =      start_time
-clmstep =    start_time + 1
+istep      = start_time
+clmstep    = start_time
 
 model.TimingInfo.BaseUnit        = 1.0
 model.TimingInfo.DumpInterval    = 1.0
@@ -108,46 +128,48 @@ model.TimingInfo.StartCount      = start_time
 model.TimingInfo.StartTime       = start_time
 model.TimingInfo.StopTime        = stop_time
 
-model.TimeStep.Type              = 'Constant'
-model.TimeStep.Value             =  1.0
+model.TimeStep.Type     = 'Constant'
+model.TimeStep.Value    =  1.0
 
 
 #-----------------------------------------------------------------------------------------
 # Set processor topology
 #-----------------------------------------------------------------------------------------
 
-model.Process.Topology.P = 16
-model.Process.Topology.Q = 16
-model.Process.Topology.R = 1
+model.Process.Topology.P    = 16
+model.Process.Topology.Q    = 16
+model.Process.Topology.R    = 1
+
+nproc = model.Process.Topology.P * model.Process.Topology.Q * model.Process.Topology.R
 
 
 #-----------------------------------------------------------------------------------------
 # Computational grid
 #-----------------------------------------------------------------------------------------
 
-model.ComputationalGrid.Lower.X = 0.0
-model.ComputationalGrid.Lower.Y = 0.0
-model.ComputationalGrid.Lower.Z = 0.0
+model.ComputationalGrid.Lower.X    = 0.0
+model.ComputationalGrid.Lower.Y    = 0.0
+model.ComputationalGrid.Lower.Z    = 0.0
 
-model.ComputationalGrid.NX = 608
-model.ComputationalGrid.NY = 896
-model.ComputationalGrid.NZ = 10   
+model.ComputationalGrid.NX    = 608
+model.ComputationalGrid.NY    = 896
+model.ComputationalGrid.NZ    = 10   
 
-model.ComputationalGrid.DX = 1000.0
-model.ComputationalGrid.DY = 1000.0
-model.ComputationalGrid.DZ = 200.0
+model.ComputationalGrid.DX    = 1000.0
+model.ComputationalGrid.DY    = 1000.0
+model.ComputationalGrid.DZ    = 200.0
 
 
 #-----------------------------------------------------------------------------------------
 # Name GeomInputs
 #-----------------------------------------------------------------------------------------
 
+model.Domain.GeomName                    = 'domain'
 model.GeomInput.Names                    = 'domaininput indi_input'
-model.GeomInput.domaininput.GeomName     = 'domain'
 model.GeomInput.domaininput.InputType    = 'SolidFile'
 model.GeomInput.domaininput.GeomNames    = 'domain'
 model.GeomInput.domaininput.FileName     = domain_file
-model.Geom.domain.Patches                = 'land top bottom'
+model.Geom.domain.Patches                = 'top bottom land'
 
 
 #-----------------------------------------------------------------------------------------
@@ -288,6 +310,7 @@ model.Geom.g8.Perm.Value        = 0.2
 # Permeability tensor
 #-----------------------------------------------------------------------------------------
 
+model.Perm.TensorType                 = 'TensorByGeom'
 model.Geom.Perm.TensorByGeom.Names    = 'domain b1 b2 g1 g2 g4 g5 g6 g7'
 
 model.Geom.domain.Perm.TensorValX     = 1.0
@@ -407,8 +430,8 @@ model.Geom.g8.Porosity.Value        = 0.33
 model.Phase.RelPerm.Type         = 'VanGenuchten'
 model.Phase.RelPerm.GeomNames    = "domain s1 s2 s3 s4 s5 s6 s7 s8 s9 s10 s11 s12 s13"
 
-model.Geom.domain.RelPerm.Alpha                  = 1.0
-model.Geom.domain.RelPerm.N                      = 3.0
+model.Geom.domain.RelPerm.Alpha                  = 0.5
+model.Geom.domain.RelPerm.N                      = 2.5
 model.Geom.domain.RelPerm.NumSamplePoints        = 20000
 model.Geom.domain.RelPerm.MinPressureHead        = -300
 model.Geom.domain.RelPerm.InterpolationMethod    = 'Linear'
@@ -499,9 +522,9 @@ model.Geom.s13.RelPerm.InterpolationMethod       = 'Linear'
 model.Phase.Saturation.Type           = 'VanGenuchten'
 model.Phase.Saturation.GeomNames      = 'domain s1 s2 s3 s4 s5 s6 s7 s8 s9 s10 s11 s12 s13'
 
-model.Geom.domain.Saturation.Alpha    = 1.0
-model.Geom.domain.Saturation.N        = 3.0
-model.Geom.domain.Saturation.SRes     = 0.001
+model.Geom.domain.Saturation.Alpha    = 0.5
+model.Geom.domain.Saturation.N        = 2.5
+model.Geom.domain.Saturation.SRes     = 0.00001
 model.Geom.domain.Saturation.SSat     = 1.0
 
 model.Geom.s1.Saturation.Alpha        = 3.548
@@ -583,8 +606,8 @@ model.Geom.domain.SpecificStorage.Value    = 1.0e-4
 # Manning's roughness
 #-----------------------------------------------------------------------------------------
 
-model.Mannings.Type = 'PFBFile'
-model.Mannings.FileName = mannings_file
+model.Mannings.Type        = 'PFBFile'
+model.Mannings.FileName    = mannings_file
 model.dist(mannings_file)
 
 
@@ -660,21 +683,19 @@ model.Cycle.constant.Repeat            = -1
 # Boundary Conditions: Pressure
 #-----------------------------------------------------------------------------------------
 
-model.BCPressure.PatchNames                    = 'land top bottom'
+model.BCPressure.PatchNames                    = 'top bottom land'
 
-model.Patch.land.BCPressure.Type               = 'FluxConst'
-model.Patch.land.BCPressure.Cycle		       = 'constant'
-model.Patch.land.BCPressure.alltime.Value      = 0.0
+model.Patch.top.BCPressure.Type                = 'OverlandFlow'
+model.Patch.top.BCPressure.Cycle               = 'constant'
+model.Patch.top.BCPressure.alltime.Value       = 0.0
 
-model.Patch.bottom.BCPressure.Type		       = 'FluxConst'
-model.Patch.bottom.BCPressure.Cycle		       = 'constant'
+model.Patch.bottom.BCPressure.Type             = 'FluxConst'
+model.Patch.bottom.BCPressure.Cycle            = 'constant'
 model.Patch.bottom.BCPressure.alltime.Value    = 0.0
 
-model.Patch.top.BCPressure.Type		           = 'OverlandFlow'
-model.Patch.top.BCPressure.Cycle		       = 'constant'
-model.Patch.top.BCPressure.alltime.Value	   = 0.0
-
-model.Solver.EvapTransFile                     = False
+model.Patch.land.BCPressure.Type               = 'FluxConst'
+model.Patch.land.BCPressure.Cycle              = 'constant'
+model.Patch.land.BCPressure.alltime.Value      = 0.0
 
 
 #-----------------------------------------------------------------------------------------
@@ -706,8 +727,8 @@ model.Geom.domain.ICPressure.RefPatch    = 'bottom'
 
 model.ICPressure.Type                    = 'PFBFile'
 model.ICPressure.GeomNames               = 'domain'
-model.Geom.domain.ICPressure.FileName    = initial_press_file
-model.dist(inital_press_file)
+model.Geom.domain.ICPressure.FileName    = initial_file
+model.dist(initial_file)
 
 
 #-----------------------------------------------------------------------------------------
@@ -750,43 +771,49 @@ model.Solver.CLM.SingleFile         = True
 # Set solver parameters
 #-----------------------------------------------------------------------------------------
 
-model.Solver                                       = 'Richards'
-model.Solver.MaxIter                               = 100000
-model.Solver.TerrainFollowingGrid                  = True
-model.Solver.Nonlinear.MaxIter                     = 2000
-model.Solver.Nonlinear.ResidualTol                 = 1e-5
-model.Solver.Nonlinear.EtaChoice                   = 'EtaConstant'
-model.Solver.Nonlinear.EtaValue                    = 1e-3
-model.Solver.Nonlinear.UseJacobian                 = False
-model.Solver.Nonlinear.UseJacobian                 = True
-model.Solver.Nonlinear.DerivativeEpsilon           = 1e-16
-model.Solver.Nonlinear.StepTol                     = 1e-25
-model.Solver.Linear.KrylovDimension                = 500
-model.Solver.Linear.MaxRestarts                    = 8
-model.Solver.MaxConvergenceFailures                = 5
-model.Solver.Linear.Preconditioner                 = 'PFMG'
-model.Solver.Linear.Preconditioner.PCMatrixType    = 'FullJacobian'
-model.Solver.WriteSiloPressure                     = False
-model.Solver.PrintSubsurfData                      = True
-model.Solver.PrintMask                             = True
-model.Solver.PrintVelocities                       = False
-model.Solver.PrintSaturation                       = False
-model.Solver.PrintPressure                         = True
-model.Solver.PrintSubsurfData                      = True 
-model.Solver.PrintSaturation                       = True
-model.Solver.WriteCLMBinary                        = False
-model.Solver.PrintCLM                              = True
-model.Solver.WriteSiloSpecificStorage              = False
-model.Solver.WriteSiloMannings                     = False
-model.Solver.WriteSiloMask                         = False
-model.Solver.WriteSiloSlopes                       = False
-model.Solver.WriteSiloSubsurfData                  = False
-model.Solver.WriteSiloPressure                     = False
-model.Solver.WriteSiloSaturation                   = False
-model.Solver.WriteSiloEvapTrans                    = False
-model.Solver.WriteSiloEvapTransSum                 = False
-model.Solver.WriteSiloOverlandSum                  = False
-model.Solver.WriteSiloCLM                          = False
+model.Solver                                                = 'Richards'
+model.Solver.MaxIter                                        = 250000
+model.Solver.MaxConvergenceFailures                         = 5
+model.Solver.TerrainFollowingGrid                           = True
+model.Solver.TerrainFollowingGrid.SlopeUpwindFormulation    = 'Upwind'
+model.Solver.Nonlinear.MaxIter                              = 250
+model.Solver.Nonlinear.ResidualTol                          = 1e-2
+model.Solver.Nonlinear.EtaChoice                            = 'EtaConstant'
+model.Solver.Nonlinear.EtaValue                             = 1e-2 
+model.Solver.Nonlinear.UseJacobian                          = True
+model.Solver.Nonlinear.DerivativeEpsilon                    = 1e-16
+model.Solver.Nonlinear.StepTol                              = 1e-15
+model.Solver.Nonlinear.Globalization                        = 'LineSearch'
+model.Solver.Linear.KrylovDimension                         = 500
+model.Solver.Linear.MaxRestarts                             = 8
+model.Solver.MaxConvergenceFailures                         = 5
+model.Solver.Linear.Preconditioner                          = 'PFMG'
+model.Solver.Linear.Preconditioner.PCMatrixType             = 'PFSeymmetric'
+model.Solver.Linear.Preconditioner.PFMG.NumPreRelax         = 3
+model.Solver.Linear.Preconditioner.PFMG.NumPostRelax        = 2
+
+model.Solver.WriteSiloPressure           = False
+model.Solver.PrintSubsurfData            = True
+model.Solver.PrintMask                   = True
+model.Solver.PrintVelocities             = False
+model.Solver.PrintSaturation             = False
+model.Solver.PrintPressure               = True
+model.Solver.PrintSubsurfData            = True 
+model.Solver.PrintSaturation             = True
+model.Solver.WriteCLMBinary              = False
+model.Solver.PrintCLM                    = True
+model.Solver.WriteSiloSpecificStorage    = False
+model.Solver.WriteSiloMannings           = False
+model.Solver.WriteSiloMask               = False
+model.Solver.WriteSiloSlopes             = False
+model.Solver.WriteSiloSubsurfData        = False
+model.Solver.WriteSiloPressure           = False
+model.Solver.WriteSiloSaturation         = False
+model.Solver.WriteSiloEvapTrans          = False
+model.Solver.WriteSiloEvapTransSum       = False
+model.Solver.WriteSiloOverlandSum        = False
+model.Solver.WriteSiloCLM                = False
+model.Solver.EvapTransFile               = False
 
 
 #-----------------------------------------------------------------------------------------
