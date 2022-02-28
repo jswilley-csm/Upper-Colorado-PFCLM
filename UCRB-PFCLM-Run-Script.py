@@ -13,41 +13,41 @@ to Verde and navigate to: /hydrodata/PFCLM/UCRB_Baseline. If you are not a group
 reach out and have one of us share the files with you – we'd be happy to. On Verde, make 
 sure you have the original files by confirming they are dated as follows:
 
-		 hydrodata  41M Feb 28 09:57 UCRB.final.drv_vegm.dat
-		 hydrodata 4.2M Feb 28 09:57 UCRB.final.mannings.pfb
-		 hydrodata  42M Feb 28 09:57 UCRB.final.subsurface.pfb
-		 hydrodata  42M Feb 28 09:57 UCRB.final.flow_barrier.pfb
-		 hydrodata 4.2M Feb 28 09:57 UCRB.final.slope_y.pfb
-		 hydrodata 4.2M Feb 28 09:57 UCRB.final.slope_x.pfb
-		 hydrodata 4.2M Feb 28 09:57 UCRB.final.landcover_IGBP.pfb
-		 hydrodata 4.3K Feb 28 09:57 UCRB.final.drv_vegp.dat
-		 hydrodata 9.4K Feb 28 09:57 UCRB.final.drv_clmin.dat
-		 hydrodata 876K Feb 28 09:57 UCRB.final.domain.pfsol
-		 
+         hydrodata  41M Feb 28 09:57 UCRB.final.drv_vegm.dat
+         hydrodata 4.2M Feb 28 09:57 UCRB.final.mannings.pfb
+         hydrodata  42M Feb 28 09:57 UCRB.final.subsurface.pfb
+         hydrodata  42M Feb 28 09:57 UCRB.final.flow_barrier.pfb
+         hydrodata 4.2M Feb 28 09:57 UCRB.final.slope_y.pfb
+         hydrodata 4.2M Feb 28 09:57 UCRB.final.slope_x.pfb
+         hydrodata 4.2M Feb 28 09:57 UCRB.final.landcover_IGBP.pfb
+         hydrodata 4.3K Feb 28 09:57 UCRB.final.drv_vegp.dat
+         hydrodata 9.4K Feb 28 09:57 UCRB.final.drv_clmin.dat
+         hydrodata 876K Feb 28 09:57 UCRB.final.domain.pfsol
+         
 Recommended Directory Structure:
-	UCRB-run-001         <- parent directory to hold all files for documentation
-		scripts          <- holds this script and others i.e. your job script
-		inputs           <- to hold your official UCRB run inputs
-		pf-output        <- to hold pressure files and other values you choose to print
-		clm-output       <- to hold CLM output files
-		restart-files    <- to contain copies of CLM restart files and last pressure files
-		forcing          <- forcing parent directory to hold meteorological inputs
-			YYYY         <- if running multiple years, add subfolders with years as names
-			YYYY
-			...
+    UCRB-run-001         <- parent directory to hold all files for documentation
+        scripts          <- holds this script and others i.e. your job script
+        inputs           <- to hold your official UCRB run inputs
+        pf-output        <- to hold pressure files and other values you choose to print
+        clm-output       <- to hold CLM output files
+        restart-files    <- to contain copies of CLM restart files and last pressure files
+        forcing          <- forcing parent directory to hold meteorological inputs
+            YYYY         <- if running multiple years, add subfolders with years as names
+            YYYY
+            ...
 
 Version History:
 Jackson Swilley | Jan 30, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.com 
-	Comment: original transcription
-	
+    Comment: original transcription
+    
 Jackson Swilley | Feb 12, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.com 
-	Comment: adding clipped CONUS 2.0 inputs
+    Comment: adding clipped CONUS 2.0 inputs
 
 Jackson Swilley | Feb 21, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.com 
-	Comment: final inputs - now runs
-	
+    Comment: final inputs - now runs
+    
 Jackson Swilley | Feb 28, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.com 
-	Comment: updating documentation
+    Comment: updating documentation
 '''
 
 
