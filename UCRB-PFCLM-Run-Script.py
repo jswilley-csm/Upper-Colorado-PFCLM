@@ -24,9 +24,9 @@ sure you have the original files by confirming they are dated as follows:
          hydrodata 9.4K Feb 28 09:57 UCRB.final.drv_clmin.dat
          hydrodata 876K Feb 28 09:57 UCRB.final.domain.pfsol
          
-Recommended Directory Structure:
+Recommended directory structure:
     UCRB-run-001         <- parent directory to hold all files for documentation
-        scripts          <- holds this script and others i.e. your job script
+        scripts          <- holds this script and others, i.e. your job script
         inputs           <- to hold your official UCRB run inputs
         pf-output        <- to hold pressure files and other values you choose to print
         clm-output       <- to hold CLM output files
@@ -36,7 +36,7 @@ Recommended Directory Structure:
             YYYY
             ...
 
-Things You Should Change:
+Things you should change:
     1.) the start and stop times - you won't finish in 8760 timesteps 12 hours; try 2000
     2.) the initial pressure file - use the last pressure file from your spinup
     3.) the clm driver file's start time based on the forcing you give it
@@ -50,7 +50,7 @@ Differences from CONUS 2.0:
     3.) initialization - unless you clip the CONUS 2.0 initial pressure and use that
     4.) the number of processors required
 
-Version History:
+Version history:
 Jackson Swilley | Jan 30, 2022 | js2834@princeton.edu or jackson.swilley5@gmail.com 
     Comment: original transcription
     
@@ -766,13 +766,12 @@ model.KnownSolution    = 'NoKnownSolution'
 
 
 #-----------------------------------------------------------------------------------------
-# Set CLM parameters
+# Set LSM parameters
 #-----------------------------------------------------------------------------------------
 
 model.Solver.LSM                    = 'CLM'
 model.Solver.CLM.CLMFileDir         = clm_output_path
 model.Solver.CLM.Print1dOut         = False
-model.Solver.BinaryOutDir           = False
 model.Solver.CLM.CLMDumpInterval    = 1
 model.Solver.CLM.MetForcing         = '3D'
 model.Solver.CLM.MetFileName        = 'NLDAS'
@@ -819,13 +818,16 @@ model.Solver.Linear.Preconditioner.PCMatrixType             = 'PFSeymmetric'
 model.Solver.Linear.Preconditioner.PFMG.NumPreRelax         = 3
 model.Solver.Linear.Preconditioner.PFMG.NumPostRelax        = 2
 
-model.Solver.PrintSubsurfData            = True
-model.Solver.PrintMask                   = True
-model.Solver.PrintVelocities             = False
-model.Solver.PrintSaturation             = False
+model.Solver.EvapTransFile    = False
+model.Solver.BinaryOutDir     = False
+
 model.Solver.PrintPressure               = True
-model.Solver.WriteCLMBinary              = False
 model.Solver.PrintCLM                    = True
+model.Solver.PrintSaturation             = False
+model.Solver.PrintVelocities             = False
+model.Solver.PrintSubsurfData            = False
+model.Solver.PrintMask                   = False
+model.Solver.WriteCLMBinary              = False
 model.Solver.WriteSiloSpecificStorage    = False
 model.Solver.WriteSiloMannings           = False
 model.Solver.WriteSiloMask               = False
@@ -837,7 +839,6 @@ model.Solver.WriteSiloEvapTrans          = False
 model.Solver.WriteSiloEvapTransSum       = False
 model.Solver.WriteSiloOverlandSum        = False
 model.Solver.WriteSiloCLM                = False
-model.Solver.EvapTransFile               = False
 
 
 #-----------------------------------------------------------------------------------------
