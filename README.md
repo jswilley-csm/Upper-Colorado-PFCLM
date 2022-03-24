@@ -14,7 +14,8 @@ used in their development. An aside, you will an initial condition file and mete
 forcing data; neither has a default. To access the original set of input parameters, login 
 to Verde and navigate to: /hydrodata/PFCLM/UCRB_Baseline. If you are not a group member, 
 reach out and have one of us share the files with you – we'd be happy to. On Verde, make 
-sure you have the original files by confirming they are dated as follows:
+sure you have the original files by confirming they are dated as follows:  
+
          hydrodata  41M Feb 28 09:57 UCRB.final.drv_vegm.dat  
          hydrodata 4.2M Feb 28 09:57 UCRB.final.mannings.pfb  
          hydrodata  42M Feb 28 09:57 UCRB.final.subsurface.pfb  
@@ -26,7 +27,7 @@ sure you have the original files by confirming they are dated as follows:
          hydrodata 9.4K Feb 28 09:57 UCRB.final.drv_clmin.dat  
          hydrodata 876K Feb 28 09:57 UCRB.final.domain.pfsol  
          
-Recommended Directory Structure:
+Recommended Directory Structure:  
     UCRB-run-001         <- parent directory to hold all files for documentation  
         scripts          <- holds this script and others i.e. your job script  
         inputs           <- to hold your official UCRB run inputs  
@@ -37,6 +38,7 @@ Recommended Directory Structure:
             YYYY         <- if running multiple years, add subfolders with years as names  
             YYYY  
             ...  
+   
 Things You Should Change:  
     1.) the start and stop times - you won't finish in 8760 timesteps 12 hours; try 2000  
     2.) the initial pressure file - use the last pressure file from your spinup  
