@@ -800,6 +800,8 @@ model.Solver.CLM.SingleFile         = True
 model.Solver                                                = 'Richards'
 model.Solver.MaxIter                                        = 250000
 model.Solver.MaxConvergenceFailures                         = 5
+model.Solver.EvapTransFile                                  = False
+model.Solver.BinaryOutDir                                   = False
 model.Solver.TerrainFollowingGrid                           = True
 model.Solver.TerrainFollowingGrid.SlopeUpwindFormulation    = 'Upwind'
 model.Solver.Nonlinear.MaxIter                              = 250
@@ -812,14 +814,10 @@ model.Solver.Nonlinear.StepTol                              = 1e-15
 model.Solver.Nonlinear.Globalization                        = 'LineSearch'
 model.Solver.Linear.KrylovDimension                         = 500
 model.Solver.Linear.MaxRestarts                             = 8
-model.Solver.MaxConvergenceFailures                         = 5
 model.Solver.Linear.Preconditioner                          = 'PFMG'
 model.Solver.Linear.Preconditioner.PCMatrixType             = 'PFSeymmetric'
 model.Solver.Linear.Preconditioner.PFMG.NumPreRelax         = 3
 model.Solver.Linear.Preconditioner.PFMG.NumPostRelax        = 2
-
-model.Solver.EvapTransFile    = False
-model.Solver.BinaryOutDir     = False
 
 model.Solver.PrintPressure               = True
 model.Solver.PrintCLM                    = True
@@ -846,4 +844,3 @@ model.Solver.WriteSiloCLM                = False
 #-----------------------------------------------------------------------------------------
 
 model.run()
-

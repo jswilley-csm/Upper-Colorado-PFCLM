@@ -1,6 +1,9 @@
 # Upper-Colorado-PFCLM
+
 Parflow-CLM model of the Upper Colorado River Basin 
-  
+
+![new_layout](ReadMe_Image.png)
+
 ReadMe and gitignore coming soon
 
 #### Note to modelers:
