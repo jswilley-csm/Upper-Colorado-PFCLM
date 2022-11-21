@@ -2,7 +2,7 @@
 
 Parflow-CLM model of the Upper Colorado River Basin 
 
-![new_layout](ReadMe_Image.png)
+<img width="294" alt="image" src="https://user-images.githubusercontent.com/55851528/203094169-847a3840-e0f1-4998-a647-66448a6b90e3.png">
 
 ReadMe and gitignore coming soon
 
